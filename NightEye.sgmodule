@@ -1,0 +1,16 @@
+#!name=Night Eye Pro Unlock
+#!desc=解锁 Night Eye Pro 功能，有效期至 2099 年。包含自动解密和请求头修正。
+#!author=AI_Assistant
+#!category=Unlock
+
+[Script]
+# 核心解锁脚本
+NightEye_Unlock = type=http-response, pattern=^https?:\/\/billing\.nighteye\.app\/exc\/InstanceController, requires-body=1, max-size=0, script-path=https://raw.githubusercontent.com/ajune0527/script/refs/heads/main/nighteye.js, script-update-interval=0
+
+[Header Rewrite]
+# 强制移除 Accept-Encoding，防止服务器返回 br/zstd 压缩导致脚本解析失败
+^https?:\/\/billing\.nighteye\.app header-del Accept-Encoding
+
+[MITM]
+# 自动添加域名解密
+hostname = %APPEND% billing.nighteye.app
