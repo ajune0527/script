@@ -9,10 +9,10 @@ if (body) {
         let obj = JSON.parse(body);
         
         // 核心修改逻辑
-        obj.expiredDate = "13 Dec 2099";
-        obj.isActive = true;
-        obj.isProVersion = "t";
-        obj.isLiteVersion = "f"; 
+        obj.data.expiredDate = "13 Dec 2099";
+        obj.data.isActive = true;
+        obj.data.isProVersion = "t";
+        obj.data.isLiteVersion = "f"; 
         
         console.log("✅ NightEye: 授权已修正至 2099 年");
         
