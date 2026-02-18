@@ -1,0 +1,39 @@
+#!name = 彩云天气 SVIP
+#!desc = 解锁彩云天气 SVIP 权限。包含：解锁会员功能、去广告、精简发现页。
+#!author = wf021325
+#!icon = https://raw.githubusercontent.com/luestr/IconWarehouse/master/original/Caiyun_Weather.png
+#!date = 2026-02-18 11:56:00
+
+[Rule]
+# 屏蔽上传日志
+DOMAIN, gather.colorfulclouds.net, REJECT
+
+[Script]
+# --- 广告与冗余功能屏蔽 (直接拒绝) ---
+http-response ^https:\/\/ad\.cyapi\.cn\/v2\/req\?app_name=weather reject-dict
+http-response ^https:\/\/biz\.cyapi\.cn\/p\/v1\/trial_card\/info reject-dict
+http-response ^https:\/\/biz\.cyapi\.cn\/api\/v1\/token\/device$ reject-dict
+http-response ^https:\/\/biz\.cyapi\.cn\/p\/v1\/entries reject-dict
+http-response ^https:\/\/starplucker\.cyapi\.cn\/v3\/config$ reject-dict
+http-response ^https:\/\/starplucker\.cyapi\.cn\/v3\/notification\/message_center reject-dict
+http-response ^https:\/\/starplucker\.cyapi\.cn\/v3\/config\/cypage\/(home|home_activity|40day)\/conditions reject-dict
+
+# --- 核心脚本挂载 ---
+
+# 1. 请求拦截 (修改 Headers)
+# 卫星云图、预报授权、V3接口验证
+http-request ^https:\/\/wrapper\.cyapi\.cn\/v1\/(satellite|nafp\/origin_images) script-path=https://raw.githubusercontent.com/wf021325/qx/master/js/caiyun.js, tag=彩云请求头修改
+http-request ^https:\/\/starplucker\.cyapi\.cn\/v3\/ script-path=https://raw.githubusercontent.com/wf021325/qx/master/js/caiyun.js, tag=彩云V3接口授权
+
+# 2. 响应拦截 (修改 Body)
+# 解锁会员权限
+http-response ^https:\/\/biz\.cyapi\.cn\/v2\/user script-path=https://raw.githubusercontent.com/wf021325/qx/master/js/caiyun.js, requires-body=true, tag=彩云旧版VIP
+http-response ^https?:\/\/biz\.cyapi\.cn\/api\/v1\/user_detail$ script-path=https://raw.githubusercontent.com/wf021325/qx/master/js/caiyun.js, requires-body=true, tag=彩云新版VIP
+
+# 功能增强与活动精简
+http-response ^https:\/\/wrapper\.cyapi\.cn\/v1\/activity\?app_name=weather script-path=https://raw.githubusercontent.com/wf021325/qx/master/js/caiyun.js, requires-body=true, tag=彩云赏叶赏花模块
+http-response ^https:\/\/starplucker\.cyapi\.cn\/v3\/operation\/(banners|features|feeds) script-path=https://raw.githubusercontent.com/wf021325/qx/master/js/caiyun.js, requires-body=true, tag=彩云发现页美化
+http-response ^https:\/\/starplucker\.cyapi\.cn\/v3\/campaigns$ script-path=https://raw.githubusercontent.com/wf021325/qx/master/js/caiyun.js, requires-body=true, tag=彩云活动屏蔽
+
+[MITM]
+hostname = *.cyapi.cn
